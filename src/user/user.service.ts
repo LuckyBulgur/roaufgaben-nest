@@ -21,8 +21,16 @@ export class UserService {
         throw new HttpException('Erfolgreich registriert', 201);
     }
 
+    async changePassword(userId: number, password: string): Promise<User> {
+        const user: User = await this.user.findOne(userId);
+        user.password = await bcrypt.hash(password, 10);
+        await this.user.save(user);
+        throw new HttpException('Passwort erfolgreich geändert', 201);
+    }
+
     async deleteUser(userId: number): Promise<DeleteResult> {
-        return await this.user.delete(userId);
+        await this.user.delete(userId);
+        throw new HttpException('Erfolgreich gelöscht', 201);
     }
 
     async checkIfUserExists(username: string): Promise<boolean> {
@@ -34,17 +42,23 @@ export class UserService {
         return false;
     }
 
-    async joinClass(userId: number, _classId: number): Promise<User> {
-        const _class: Class = await this.classService.getClass(_classId);
+    async joinClass(userId: number, _classUUID: string): Promise<any> {
+        const _class: Class = await this.classService.getClass(_classUUID);
         const user: User = await this.user.findOne(userId, { relations: ['class'] });
 
         if (!user.class) {
             user.class = [];
         }
-        if (!user.class.find(c => c.id == _classId)) {
+        if (!user.class.find(c => c.link == _classUUID)) {
             user.class.push(_class);
+        } else {
+            throw new HttpException('Sie sind bereits in dieser Klasse', 400);
         }
-        return this.user.save(user);
+        await this.user.save(user);
+        return {
+            message: 'Erfolgreich beigetreten',
+            classId: _class.id
+        }
     }
 
     async saveUser(user: User): Promise<User> {
@@ -56,7 +70,7 @@ export class UserService {
     }
 
     async getResponseObject(id: number): Promise<lowUser> {
-        return await (await this.user.findOne(id)).toResponseObject();
+        return (await this.user.findOne(id)).toResponseObject();
     }
 
     async getUser(id: number): Promise<User> {
@@ -72,7 +86,11 @@ export class UserService {
         let classes: Class[] = [];
         for (let i = 0; i < user.class.length; i++) {
             const _class = await this.classService.getClass(user.class[i].id, { relations: ['creator'] });
-            _class.creator = user.toResponseObject();
+            const creator = (await this.getUserByName(_class.creator.username)).toResponseObject();
+            _class.creator = creator;
+            if (creator.username != user.username) {
+                _class.link = null
+            }
             classes.push(_class);
         }
         return classes;

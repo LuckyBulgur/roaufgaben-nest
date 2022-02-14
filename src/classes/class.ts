@@ -1,7 +1,17 @@
-import { IsString, MaxLength, MinLength } from "class-validator";
-import { Task } from "src/tasks/task";
-import { lowUser, User } from "src/user/user";
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, ManyToMany, JoinTable } from "typeorm";
+import { IsString, MaxLength, MinLength } from 'class-validator';
+import { Task } from 'src/tasks/task';
+import { lowUser, User } from 'src/user/user';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    Generated,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Class {
@@ -26,6 +36,10 @@ export class Class {
     })
     @JoinTable()
     tasks: Task[];
+
+    @Column()
+    @Generated('uuid')
+    link: string;
 
     @CreateDateColumn()
     reg_date: Date;

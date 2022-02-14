@@ -29,7 +29,7 @@ export class ClassesService {
         throw new HttpException('Class created', 201);
     }
 
-    async getClass(id: number, options?: {}): Promise<Class> {
+    async getClass(id: number | string, options?: {}): Promise<Class> {
         return await this.classes.findOne(id, options);
     }
 
@@ -40,6 +40,7 @@ export class ClassesService {
         for (let i = 0; i < _class.length; i++) {
             const task: Task[] = await this.getTasks(_class[i].id, userId);
             for (let j = 0; j < task.length; j++) {
+                task[j].author = (await this.userRepo.findOne({ username: task[j].author.username })).toResponseObject();
                 tasks.push(task[j]);
             }
         }
@@ -56,6 +57,7 @@ export class ClassesService {
         for (let i = 0; i < _class.length; i++) {
             const task: Task[] = await this.getTasks(_class[i].id, userId);
             for (let j = 0; j < task.length; j++) {
+                task[j].author = (await this.userRepo.findOne({ username: task[j].author.username })).toResponseObject();
                 tasks.push(task[j]);
             }
         }
@@ -74,7 +76,7 @@ export class ClassesService {
             for (let i = 0; i < _class.tasks.length; i++) {
                 const task = await this.taskRepo.findOne(_class.tasks[i].id, { relations: ['author'] });
                 if (task.submission > new Date()) {
-                    task.author = user.toResponseObject();
+                    task.author = (await this.userRepo.findOne({ username: task.author.username })).toResponseObject();
                     tasks.push(task);
                 }
             }

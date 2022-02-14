@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetCurrentUserId } from 'src/auth/utils/get-user-id.decorator';
 import { Class } from 'src/classes/class';
@@ -33,9 +33,15 @@ export class UserController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post("/join/:classid")
-    joinClass(@GetCurrentUserId() userId: number, @Param('classid', ParseIntPipe) _classId: number): Promise<User> {
-        return this.userService.joinClass(userId, _classId);
+    @Post('/change-password')
+    changePassword(@GetCurrentUserId() userId: number, @Body() data): Promise<User> {
+        return this.userService.changePassword(userId, data.password);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post("/join/:classUUID")
+    joinClass(@GetCurrentUserId() userId: number, @Param('classUUID', ParseUUIDPipe) _classUUID: string): Promise<any> {
+        return this.userService.joinClass(userId, _classUUID);
     }
 
     @UseGuards(JwtAuthGuard)
