@@ -29,6 +29,10 @@ export class ClassesService {
         throw new HttpException('Class created', 201);
     }
 
+    async getClassByUUID(uuid: string): Promise<Class> {
+        return await this.classes.findOne({ link: uuid });
+    }
+
     async getClass(id: number | string, options?: {}): Promise<Class> {
         return await this.classes.findOne(id, options);
     }
@@ -80,6 +84,9 @@ export class ClassesService {
                     tasks.push(task);
                 }
             }
+
+            tasks.sort((a, b) => a.submission.getTime() - b.submission.getTime());
+
             return tasks;
         } else {
             throw new UnauthorizedException();

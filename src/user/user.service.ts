@@ -43,7 +43,7 @@ export class UserService {
     }
 
     async joinClass(userId: number, _classUUID: string): Promise<any> {
-        const _class: Class = await this.classService.getClass(_classUUID);
+        const _class: Class = await this.classService.getClassByUUID(_classUUID);
         const user: User = await this.user.findOne(userId, { relations: ['class'] });
 
         if (!user.class) {
@@ -93,6 +93,13 @@ export class UserService {
             }
             classes.push(_class);
         }
+
+        classes.sort(function (a, b) {
+            if (a.name < b.name) { return -1; }
+            if (a.name > b.name) { return 1; }
+            return 0;
+        });
+
         return classes;
     }
 }
