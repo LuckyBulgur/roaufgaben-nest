@@ -33,6 +33,11 @@ export class ClassesController {
         return this.classService.getNewestTasks(userId);
     }
 
+    @Get('/:uuid')
+    getClassByUUID(@Param('uuid') uuid: string): Promise<Class> {
+        return this.classService.getClassByUUID(uuid);
+    }
+
     @Post('/update/:id')
     updateClass(@GetCurrentUserId() userId: number, @Param('id', ParseIntPipe) id: number, @Body() _class: Class): Promise<UpdateResult> {
         return this.classService.updateClass(userId, id, _class);

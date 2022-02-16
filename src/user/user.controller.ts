@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpException, Param, ParseUUIDPipe, Post, UseGu
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetCurrentUserId } from 'src/auth/utils/get-user-id.decorator';
 import { Class } from 'src/classes/class';
+import { Sessions } from 'src/sessions/sessions';
 import { DeleteResult } from 'typeorm';
 
 import { lowUser, User } from './user';
@@ -42,6 +43,12 @@ export class UserController {
     @Post("/join/:classUUID")
     joinClass(@GetCurrentUserId() userId: number, @Param('classUUID', ParseUUIDPipe) _classUUID: string): Promise<any> {
         return this.userService.joinClass(userId, _classUUID);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/sessions')
+    getSessions(@GetCurrentUserId() userId: number): Promise<Sessions[]> {
+        return this.userService.getSessions(userId);
     }
 
     @UseGuards(JwtAuthGuard)

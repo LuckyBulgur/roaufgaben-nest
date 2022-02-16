@@ -1,8 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import fetch from 'node-fetch';
 import * as QRCode from 'qrcode';
+import * as requestIp from 'request-ip';
 import * as speakeasy from 'speakeasy';
+import { SessionsService } from 'src/sessions/sessions.service';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -10,7 +13,8 @@ export class AuthService {
 
     constructor(
         private userService: UserService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private sessionService: SessionsService
     ) { }
 
     async validateUser(username: string, password: string): Promise<any> {
@@ -62,12 +66,44 @@ export class AuthService {
         };
     }
 
+    async getLocation(ip: string) {
+        const response = await fetch(`https://api.krahforst.dev/ip/info?ip=${ip}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + process.env.IP_AUTH_TOKEN
+            }
+        });
 
-    async login(user: any) {
+        if (response.success == true) {
+            const response = await fetch(`https://ipwhois.app/json/${ip}`);
+            return await response.json();
+        } else {
+            return null;
+        }
+    }
+
+    async createSession(userId: number, req: any) {
+        const ip = requestIp.getClientIp(req);
+        const location = await this.getLocation(ip);
+
+        if (!location) return;
+
+        const session = {
+            location: `${location.city}, ${location.country}`,
+            ip: ip,
+            userAgent: req.get('User-Agent'),
+        }
+        await this.sessionService.createSession(userId, session);
+    }
+
+    async login(req: any) {
+        const user = req.user;
         const payload = { username: user.username, sub: user.id };
         if (user.authcode) {
             return new HttpException('You need to verify', 401);
         }
+
+        this.createSession(user.id, req);
         return {
             access_token: this.jwtService.sign(payload),
         };

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Class } from 'src/classes/class';
 import { ClassesService } from 'src/classes/classes.service';
+import { Sessions } from 'src/sessions/sessions';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 import { lowUser, User } from './user';
@@ -73,12 +74,17 @@ export class UserService {
         return (await this.user.findOne(id)).toResponseObject();
     }
 
-    async getUser(id: number): Promise<User> {
-        return await this.user.findOne(id);
+    async getUser(id: number, options?: {}): Promise<User> {
+        return await this.user.findOne(id, options);
     }
 
     async getUserByName(username: string): Promise<User> {
         return await this.user.findOne({ where: { username: username } });
+    }
+
+    async getSessions(id: number): Promise<Sessions[]> {
+        const user: User = await this.user.findOne(id, { relations: ['sessions'] });
+        return user.sessions.sort((a, b) => b.reg_date.getTime() - a.reg_date.getTime());
     }
 
     async getClass(id: number): Promise<Class[]> {

@@ -1,5 +1,6 @@
 import { IsString, MaxLength, MinLength } from 'class-validator';
 import { Class } from 'src/classes/class';
+import { Sessions } from 'src/sessions/sessions';
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -29,6 +30,12 @@ export class User {
     })
     @JoinTable()
     class: Class[];
+
+    @ManyToMany(() => Sessions, {
+        cascade: true
+    })
+    @JoinTable()
+    sessions: Sessions[];
 
     @CreateDateColumn()
     reg_date: Date;
