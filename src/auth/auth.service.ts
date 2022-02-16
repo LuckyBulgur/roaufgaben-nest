@@ -73,8 +73,9 @@ export class AuthService {
                 'Authorization': 'Bearer ' + process.env.IP_AUTH_TOKEN
             }
         });
+        const result = await response.json()
 
-        if (response.success == true) {
+        if (result.success == true) {
             const response = await fetch(`https://ipwhois.app/json/${ip}`);
             return await response.json();
         } else {
