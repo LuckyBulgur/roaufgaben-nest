@@ -29,7 +29,7 @@ import { UserModule } from './user/user.module';
     ClassesModule,
     TasksModule,
     AuthModule,
-    SessionsModule,
+    SessionsModule
   ],
   controllers: [AppController],
   providers: [AppService],

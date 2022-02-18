@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const isProduction = __dirname.includes('pi');
+  const isProduction = __dirname.includes('root');
   const httpsOptions = {
     key: fs.readFileSync(__dirname.replace("dist", "") + 'server.key'),
     cert: fs.readFileSync(__dirname.replace("dist", "") + 'server.crt'),

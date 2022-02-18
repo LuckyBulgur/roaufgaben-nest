@@ -73,9 +73,9 @@ export class AuthService {
                 'Authorization': 'Bearer ' + process.env.IP_AUTH_TOKEN
             }
         });
-        const result = await response.json()
+        const data: any = await response.json();
 
-        if (result.success == true) {
+        if (data.success == true) {
             const response = await fetch(`https://ipwhois.app/json/${ip}`);
             return await response.json();
         } else {
@@ -85,13 +85,13 @@ export class AuthService {
 
     async createSession(userId: number, req: any) {
         const ip = requestIp.getClientIp(req);
-        const location = await this.getLocation(ip);
+        const location: any = await this.getLocation(ip);
 
         if (!location) return;
 
         const session = {
             location: `${location.city}, ${location.country}`,
-            ip: ip,
+            ip: (ip === "::1") ? "localhost" : ip,
             userAgent: req.get('User-Agent'),
         }
         await this.sessionService.createSession(userId, session);
