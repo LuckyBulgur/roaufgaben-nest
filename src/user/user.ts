@@ -43,7 +43,6 @@ export class User {
     toResponseObject(): lowUser {
         return {
             username: this.username,
-            haveTwoFactor: this.authcode ? true : false,
             reg_date: this.reg_date,
         };
     }
@@ -51,6 +50,5 @@ export class User {
 
 export class lowUser {
     username: string;
-    haveTwoFactor: boolean;
     reg_date: Date;
 }

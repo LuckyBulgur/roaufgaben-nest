@@ -58,6 +58,7 @@ export class ClassesService {
         const _class: Class[] = (await this.userRepo.findOne(userId, { relations: ['class'] })).class;
 
         let tasks: Task[] = [];
+        console.time();
         for (let i = 0; i < _class.length; i++) {
             const task: Task[] = await this.getTasks(_class[i].id, userId);
             for (let j = 0; j < task.length; j++) {
@@ -65,6 +66,7 @@ export class ClassesService {
                 tasks.push(task[j]);
             }
         }
+        console.timeEnd();
 
         tasks.sort((a, b) => b.reg_date.getTime() - a.reg_date.getTime());
 

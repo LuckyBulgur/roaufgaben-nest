@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import axios from 'axios';
 import * as bcrypt from 'bcrypt';
-import fetch from 'node-fetch';
 import * as QRCode from 'qrcode';
 import * as requestIp from 'request-ip';
 import * as speakeasy from 'speakeasy';
@@ -67,27 +67,17 @@ export class AuthService {
     }
 
     async getLocation(ip: string) {
-        const response = await fetch(`https://api.krahforst.dev/ip/info?ip=${ip}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + process.env.IP_AUTH_TOKEN
-            }
-        });
-        const data: any = await response.json();
-
-        if (data.success == true) {
-            const response = await fetch(`https://ipwhois.app/json/${ip}`);
-            return await response.json();
-        } else {
-            return null;
-        }
+        const response = await axios.get(`https://ipwhois.app/json/${ip}`);
+        return await response.data;
     }
 
     async createSession(userId: number, req: any) {
         const ip = requestIp.getClientIp(req);
         const location: any = await this.getLocation(ip);
 
-        if (!location) return;
+        if (location.success == false) {
+            return;
+        };
 
         const session = {
             location: `${location.city}, ${location.country}`,

@@ -6,7 +6,7 @@ import { ClassesService } from 'src/classes/classes.service';
 import { Sessions } from 'src/sessions/sessions';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
-import { lowUser, User } from './user';
+import { User } from './user';
 
 @Injectable()
 export class UserService {
@@ -70,8 +70,14 @@ export class UserService {
         return await this.user.update(user.id, user);
     }
 
-    async getResponseObject(id: number): Promise<lowUser> {
-        return (await this.user.findOne(id)).toResponseObject();
+    async getResponseObject(id: number): Promise<any> {
+        const user = await this.user.findOne(id);
+
+        return {
+            username: user.username,
+            haveTwoFactor: user.authcode ? true : false,
+            reg_date: user.reg_date
+        }
     }
 
     async getUser(id: number, options?: {}): Promise<User> {
