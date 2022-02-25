@@ -53,7 +53,7 @@ export class UserService {
         if (!user.class.find(c => c.link == _classUUID)) {
             user.class.push(_class);
         } else {
-            throw new HttpException('Du sind bereits in dieser Klasse', 400);
+            throw new HttpException('Du bist bereits in dieser Klasse', 400);
         }
         await this.user.save(user);
         return {
