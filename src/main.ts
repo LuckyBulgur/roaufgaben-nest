@@ -12,6 +12,7 @@ async function bootstrap() {
   }
   const app = await NestFactory.create(AppModule, (isProduction) ? { httpsOptions } : {});
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
   await app.listen((isProduction) ? 443 : 3001);
 }
 bootstrap();
