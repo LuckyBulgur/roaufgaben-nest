@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
-import { RateLimiterGuard } from 'nestjs-rate-limiter';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -10,7 +10,8 @@ import { GetCurrentUserId } from './utils/get-user-id.decorator';
 export class AuthController {
     constructor(private authService: AuthService) { }
 
-    @UseGuards(LocalAuthGuard, RateLimiterGuard)
+    @UseGuards(ThrottlerGuard, LocalAuthGuard)
+    @Throttle(5, 18000)
     @Post("/login")
     login(@Request() req: any): any {
         return this.authService.login(req);

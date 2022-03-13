@@ -1,4 +1,5 @@
 import { Body, Controller, Get, HttpException, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetCurrentUserId } from 'src/auth/utils/get-user-id.decorator';
 import { Class } from 'src/classes/class';
@@ -14,6 +15,8 @@ export class UserController {
     constructor(private readonly userService: UserService) { }
 
     @Post()
+    @UseGuards(ThrottlerGuard)
+    @Throttle(2, 3600)
     async createUser(@Body() user: User): Promise<User> {
         if (await this.userService.checkIfUserExists(user.username)) {
             throw new HttpException('Dieser Benutzername ist bereits vergeben', 400);

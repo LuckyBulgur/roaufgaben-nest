@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
@@ -24,6 +25,10 @@ import { UserModule } from './user/user.module';
       database: process.env.DB_NAME,
       entities: [User, Class, Task, Sessions],
       synchronize: true,
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 18000,
+      limit: 5,
     }),
     UserModule,
     ClassesModule,
