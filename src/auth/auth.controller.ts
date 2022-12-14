@@ -11,7 +11,7 @@ export class AuthController {
     constructor(private authService: AuthService) { }
 
     @UseGuards(ThrottlerGuard, LocalAuthGuard)
-    @Throttle(5, 18000)
+    @Throttle(50, 18000)
     @Post("/login")
     login(@Request() req: any): any {
         return this.authService.login(req);
